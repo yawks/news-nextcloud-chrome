@@ -1,0 +1,48 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="styles/listree.min.css" />
+    <link rel="stylesheet" href="styles/news.css" />
+    <script src="scripts/jquery-3.6.0.min.js"></script>
+    <script src="scripts/listree.umd.min.js"></script>
+    <script src="scripts/settings.js"></script>
+    <script src="scripts/news.js"></script>
+</head>
+
+<body>
+    <div class="main">
+        <div class="toolbar">
+            <div id="toggle_folders_tree">
+                <img class="icon" alt="toggle feeds tree panel" src="images/burger.png" />
+            </div>
+            <div id="expand_folders_tree">
+                <img class="icon" alt="expand feeds tree" src="images/add.png" />
+            </div>
+            <div id="collapse_folders_tree">
+                <img class="icon" alt="collapse feeds tree" src="images/minus.png" />
+            </div>
+
+            <div id="settings">
+                <a href="settings.html"><img class="icon" alt="settings" src="images/settings.png" /></a>
+            </div>
+        </div>
+        <div class="content">
+            <div>
+                <div id="all-items">
+                    <span>All items</span>
+                </div>
+                <div id="folders_tree">
+                </div>
+            </div>
+            <div id="feeds_list">
+            </div>
+            <div id="feed_content_container">
+                <div class="holds-the-iframe">
+                    <iframe id="feed_content">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+</body>
+
+</html>

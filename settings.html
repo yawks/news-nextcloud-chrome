@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Nextcloud news - Options</title>
+
+    <script src="scripts/jquery-3.6.0.min.js"></script>
+    <script src="scripts/toast.min.js"></script>
+    <script src="scripts/settings.js"></script>
+    <script src="scripts/settings-init.js"></script>
+    <link rel="stylesheet" href="styles/settings.css" type="text/css" />
+
+</head>
+
+<body class="optionsPage">
+    <div class="toolbar">
+        <div id="toggle_feeds_tree">
+            <a href="news.html"><img alt="go back to news dashabord" src="images/left.png" /></a>
+        </div>
+    </div>
+    <div id="settings">
+        <h3>Nextcloud credentials</h3>
+        <table>
+            <tr>
+                <td>
+                    <span>Nextcloud url</span>
+                </td>
+                <td>
+                    <input type="text" id="nextcloud_url" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span>User</span>
+                </td>
+                <td>
+                    <input type="text" id="nextcloud_user" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span>Password</span>
+                </td>
+                <td>
+                    <input type="password" id="nextcloud_password" />
+                </td>
+            </tr>
+
+            <tr><td/></tr>
+            
+            <tr>
+                <td>
+                    <span>Theme</span>
+                </td>
+                <td>
+                    <form>
+                        <input type="radio" name="theme" value="light" id="light"/>
+                        <label for="light">Light</label>
+                        <input type="radio" name="theme" value="dark" id="dark"/>
+                        <label for="dark">Dark</label>
+                    </form>
+                </td>
+            </tr>
+
+            <tr><td/></tr>
+
+            <tr>
+                <td />
+                <td>
+                    <button id="save_btn">Save</button>
+                    <a href="news.html">Cancel</a>
+                </td>
+            </tr>
+
+        </table>
+    </div>
+</body>
+
+</html>

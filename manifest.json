@@ -1,0 +1,35 @@
+{
+  "update_url": "https://clients2.google.com/service/update2/crx",
+
+  "name": "Chrome nextcloud news",
+  "version": "0.1",
+  "manifest_version": 2,
+  "default_locale": "en",
+  "content_security_policy": "script-src 'self' 'unsafe-eval' https://cdnjs.cloudflare.com; object-src 'self'",
+  "description": "News feed reader based on nextcloud news API.",
+  "icons": {
+    "16": "images/reader16.png",
+    "48": "images/reader48.png",
+    "128": "images/reader128.png"
+  },
+  "homepage_url": "https://github.com/yawks/chrome-news-nextcloud",
+  "background": {
+    "page": "background.html"
+  },
+  "options_page": "settings.html",
+  "permissions": [
+    "tabs",
+    "http://*/",
+    "https://*/",
+    "storage",
+    "unlimitedStorage",
+    "notifications",
+    "webRequest",
+    "webRequestBlocking"
+  ],
+  "browser_action": {
+    "default_icon": "images/reader48.png",
+    "default_title": "Chrome news nextcloud",
+    "default_popup": "mainmenu.html"
+  }
+}
