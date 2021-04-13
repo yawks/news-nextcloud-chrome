@@ -2,22 +2,41 @@ var feedsInFolders = {};
 var feedsById = {};
 
 document.addEventListener("settings_loaded", function () {
-  loadFolders();
+  //initialize page
   $("#toggle_folders_tree").click(function () {
-    $("#folders_tree").toggle();
+    $("#feeds").toggle();
+    $("#expand_folders_tree").toggle();
+    $("#collapse_folders_tree").toggle();
+    settings.feedstreeopened = !settings.feedstreeopened;
+    saveSettings();
   });
   $("#expand_folders_tree").click(function () {
     $(".listree-submenu-items").show();
+    $(".listree-submenu-heading").addClass("expanded");
   });
   $("#collapse_folders_tree").click(function () {
     $(".listree-submenu-items").hide();
+    $(".listree-submenu-heading").removeClass("expanded");
   });
   $("#all-items").click(function () {
     loadItems();
   });
+  $("#favorites").click(function () {
+    loadItems(0, 0, 2);
+  });
+  $("#unread").click(function () {
+    loadItems(0, 0, 3, false);
+  });
   if (getSettings().theme == "dark") {
     $("body").addClass("dark");
   }
+
+  if (!settings.feedstreeopened) {
+    $("#feeds").hide();
+    $("#expand_folders_tree").hide();
+    $("#collapse_folders_tree").hide();
+  }
+  loadFolders();
 });
 
 document.addEventListener("folders_loaded", function () {
@@ -85,7 +104,9 @@ function loadFolders() {
         var folder = feedsInFolders[key];
         tree +=
           '<li>\
-                <div class="listree-submenu-heading"><div class="tree-title" id="'+key+'">' +
+                <div class="listree-submenu-heading"><div class="tree-title" id="' +
+          key +
+          '">' +
           folder["name"] +
           '</div><div class="tree-unread">' +
           folder["unread"] +
@@ -117,12 +138,12 @@ function loadFolders() {
         loadItems(0, target.id, 0);
       });
 
-      $(".tree-title").click(function(e) {
+      $(".tree-title").click(function (e) {
         var target = e.target;
         if (target.id != "") {
           loadItems(0, target.id, 1);
         }
-      })
+      });
 
       listree();
       document.dispatchEvent(new Event("folders_loaded"));
@@ -130,7 +151,7 @@ function loadFolders() {
   });
 }
 
-function loadItems(offset = 0, id = 0, type = 3) {
+function loadItems(offset = 0, id = 0, type = 3, read = true) {
   var feedsUrl =
     getSettings().nextcloudurl + "/index.php/apps/news/api/v1-2/items";
   $.ajax({
@@ -140,6 +161,7 @@ function loadItems(offset = 0, id = 0, type = 3) {
       offset: offset,
       id: id,
       type: type,
+      getRead: read,
     },
     headers: {
       Authorization:
@@ -166,10 +188,18 @@ function loadItems(offset = 0, id = 0, type = 3) {
         '" class="item-img">\
          </div>\
          <div class="flex-item-title-author-container">\
-            <div class="item-title-author-container"><div>\
+            <div class="item-title-author-container">\
+            <div class="item-title-fav">\
             <div class="item-title">' +
         item["title"] +
         '</div>\
+        <div id="star-' +
+        item["feedId"] +
+        "-" +
+        item["guidHash"] +
+        '" class="star ' +
+        (item["starred"] ? "" : "non-") +
+        'favorite"/></div>\
         </div>\
         <div>\
             <div class="item-author-date-container">\
@@ -190,14 +220,11 @@ function loadItems(offset = 0, id = 0, type = 3) {
 
     $("#feeds_list").html(itemList);
     $(".item").click(function (e) {
-      var target = e.target;
-      while (target != null && target.getAttribute("content_url") == null) {
-        target = target.parentNode;
-      }
-      if (target != null && target.getAttribute("content_url") != null) {
-        $("#feed_content").attr("src", target.getAttribute("content_url"));
-        markItemAsRead(target.id);
-      }
+      openItem(e);
+    });
+
+    $(".star").click(function (e) {
+      toggleStarItem(e);
     });
   });
 }
@@ -269,4 +296,59 @@ function getItemImage(item) {
   }
 
   return image;
+}
+
+function openItem(e) {
+  var target = e.target;
+  while (target != null && target.getAttribute("content_url") == null) {
+    target = target.parentNode;
+  }
+  if (target != null && target.getAttribute("content_url") != null) {
+    $("#feed_content").attr("src", target.getAttribute("content_url"));
+    markItemAsRead(target.id);
+  }
+}
+
+function toggleStarItem(e) {
+  var REX = /star-(\d+)-(.*)/g;
+  var m = REX.exec(e.target.id);
+  if (m && m.length == 3) {
+    var action;
+    var n = $(e.target);
+    if (n.hasClass("favorite")) {
+      n.removeClass("favorite");
+      n.addClass("non-favorite");
+      action = "unstar";
+    } else {
+      n.addClass("favorite");
+      n.removeClass("non-favorite");
+      action = "star";
+    }
+
+    var feedId = m[1];
+    var guidHash = m[2];
+
+    var toggleStarItemUrl =
+      getSettings().nextcloudurl +
+      "/index.php/apps/news/api/v1-2/items/" +
+      feedId +
+      "/" +
+      guidHash +
+      "/" +
+      action;
+
+    $.ajax({
+      url: toggleStarItemUrl,
+      method: "PUT",
+      headers: {
+        Authorization:
+          "Basic " +
+          btoa(
+            getSettings().nextclouduser + ":" + getSettings().nextcloudpassword
+          ),
+      },
+    }).done(function (folders) {});
+  }
+
+  e.stopPropagation();
 }

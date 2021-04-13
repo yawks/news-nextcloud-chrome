@@ -48,9 +48,8 @@ div.toolbar img {
     overflow: scroll;
 }
 
-#all-items {
+.action-button {
     cursor: pointer;
-    background-image: url(/images/documents.png);
     background-repeat: no-repeat;
     background-size: 24px;
     padding-left: 28px;
@@ -60,8 +59,40 @@ div.toolbar img {
     margin-bottom: 10px;
 }
 
+#all-items {
+    background-image: url(/images/documents.png);
+}
+
+#favorites {
+    background-image: url(/images/star.png);
+}
+
+#unread {
+    background-image: url(/images/eye.png);
+}
 .content>div {
     border-right: 2px solid #555;
+}
+
+div.item-title-fav {
+    display: flex;
+    flex-flow: row;
+}
+
+div.star {
+    background-size: 18px;
+    width:18px;
+    height:18px;
+}
+
+div.favorite {
+    background-image: url(/images/star-filled.png);
+    
+}
+
+div.non-favorite {
+    background-image: url(/images/star.png);
+    background-size: 18px;
 }
 
 #folders_tree {
@@ -220,7 +251,7 @@ body.dark #feed_content {
     background-color: #292a2d;
 }
 
-body.dark #all-items, body.dark img.icon {
+body.dark .action-button, body.dark img.icon {
     -webkit-filter: grayscale(1) invert(1);
     filter: grayscale(1) invert(1);
 }

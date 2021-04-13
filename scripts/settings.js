@@ -3,11 +3,15 @@ var settings = {
   nextclouduser: "",
   nextcloudpassword: "",
   theme: "light",
+
+  feedstreeopened: true
 };
 
 function loadSettings() {
   _getData("news_settings", function (result) {
-    settings = JSON.parse(result);
+    if (result) {
+      settings = JSON.parse(result);
+    }
     document.dispatchEvent(new Event("settings_loaded"));
   });
 }

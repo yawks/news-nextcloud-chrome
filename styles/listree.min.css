@@ -1,6 +1,6 @@
 .listree-submenu-heading {
     cursor: pointer;
-    background-image: url(/images/folder.png);
+    background-image: url(/images/chevron-right.png);
     background-repeat: no-repeat;
     background-size: 24px;
     padding-left: 28px;
@@ -21,18 +21,9 @@ ul.listree-submenu-items {
 ul.listree-submenu-items li {
     cursor: pointer;
 }
-
-/*
-div.listree-submenu-heading.collapsed:before {
-    content: "+";
-    margin-right: 4px
+div.listree-submenu-heading.expanded {
+    background-image: url(/images/chevron-down.png);
 }
-
-div.listree-submenu-heading.expanded:before {
-    content: "-";
-    margin-right: 4px
-}
-*/
 
 .scrollable-menu {
     height: auto;
