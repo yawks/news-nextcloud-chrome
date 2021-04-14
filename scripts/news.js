@@ -1,6 +1,8 @@
 var feedsInFolders = {};
 var feedsById = {};
 
+const NB_ITEMS_TO_LOAD = 10;
+
 document.addEventListener("settings_loaded", function () {
   //initialize page
   $("#toggle_folders_tree").click(function () {
@@ -30,6 +32,17 @@ document.addEventListener("settings_loaded", function () {
   if (getSettings().theme == "dark") {
     $("body").addClass("dark");
   }
+
+  $("#feeds_list").scroll(function () {
+    if (
+      !itemLoading &&
+      $(this).scrollTop() + $(this).innerHeight() >=
+        $(this)[0].scrollHeight - 50
+    ) {
+      itemLoading = true;
+      loadItems($(".item:last")[0].id);
+    }
+  });
 
   if (!settings.feedstreeopened) {
     $("#feeds").hide();
@@ -152,12 +165,13 @@ function loadFolders() {
 }
 
 function loadItems(offset = 0, id = 0, type = 3, read = true) {
+  console.log("Load items from:"+offset);
   var feedsUrl =
     getSettings().nextcloudurl + "/index.php/apps/news/api/v1-2/items";
   $.ajax({
     url: feedsUrl,
     data: {
-      batchSize: 50,
+      batchSize: NB_ITEMS_TO_LOAD,
       offset: offset,
       id: id,
       type: type,
@@ -174,6 +188,7 @@ function loadItems(offset = 0, id = 0, type = 3, read = true) {
     var itemList = "";
     for (i in items["items"]) {
       var item = items["items"][i];
+      var itemImage = getItemImage(item);
       itemList +=
         '<div class="item ' +
         (item["unread"] ? "unread" : "") +
@@ -184,8 +199,10 @@ function loadItems(offset = 0, id = 0, type = 3, read = true) {
         '">\
         <div class="item-img-container">\
             <img src="' +
-        getItemImage(item) +
-        '" class="item-img">\
+        itemImage +
+        '" class="item-img' +
+        (itemImage == "/images/document.png" ? "-none" : "") +
+        '">\
          </div>\
          <div class="flex-item-title-author-container">\
             <div class="item-title-author-container">\
@@ -217,8 +234,13 @@ function loadItems(offset = 0, id = 0, type = 3, read = true) {
             </div>\
         </div></div></div>';
     }
+    if (offset == 0) {
+      $("#feeds_list").html(itemList);
+    } else {
+      //$("#feeds_list").innerHTML += itemList;
+      $("#feeds_list").append(itemList);
+    }
 
-    $("#feeds_list").html(itemList);
     $(".item").click(function (e) {
       openItem(e);
     });
@@ -226,6 +248,7 @@ function loadItems(offset = 0, id = 0, type = 3, read = true) {
     $(".star").click(function (e) {
       toggleStarItem(e);
     });
+    itemLoading = false;
   });
 }
 
@@ -254,7 +277,7 @@ function markItemAsRead(itemId) {
 
 function getFavicon(faviconUrl, feedUrl, linkUrl) {
   finalFaviconUrl = faviconUrl;
-  if (finalFaviconUrl == "") {
+  if (finalFaviconUrl == "" || finalFaviconUrl == null) {
     var domainName = getDomainName(feedUrl);
     if (domainName == "www.example.com") {
       domainName = getDomainName(linkUrl);
@@ -286,12 +309,11 @@ function getItemImage(item) {
   if (image == "" || image == null) {
     image = item["mediaThumbnail"];
     if (image == "" || image == null) {
+      image = "/images/document.png";
       m = REX.exec(item["body"]);
       if (m) {
         image = m[1];
       }
-    } else {
-      image = "/images/document.png";
     }
   }
 
@@ -304,7 +326,28 @@ function openItem(e) {
     target = target.parentNode;
   }
   if (target != null && target.getAttribute("content_url") != null) {
-    $("#feed_content").attr("src", target.getAttribute("content_url"));
+    var url = target.getAttribute("content_url");
+    if (
+      !settings.readibility ||
+      url.indexOf("?url=") > -1 ||
+      url.indexOf("&url=") > -1
+    ) {
+      $("#item_content_div").hide();
+      $("#item_content_iframe").show();
+      $("#item_content_iframe").attr("src", url);
+    } else {
+      $("#item_content_iframe").hide();
+      $("#item_content_div").show();
+      $.ajax({
+        url: url,
+      }).done(function (htmlString) {
+        const parser = new DOMParser();
+        var doc = parser.parseFromString(htmlString, "text/html");
+        var article = new Readability(doc).parse();
+        $("#item_content_div").html(article.content);
+      });
+    }
+
     markItemAsRead(target.id);
   }
 }

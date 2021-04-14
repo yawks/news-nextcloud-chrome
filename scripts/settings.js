@@ -3,6 +3,7 @@ var settings = {
   nextclouduser: "",
   nextcloudpassword: "",
   theme: "light",
+  readibility: false,
 
   feedstreeopened: true
 };
