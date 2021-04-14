@@ -35,7 +35,7 @@
         </div>
         <div class="content">
             <div id="feeds">
-                <div id="all-items" class="action-button">
+                <div id="all-items" class="action-button action-selected">
                     <span>All items</span>
                 </div>
                 <div id="favorites" class="action-button">
@@ -47,10 +47,12 @@
                 <div id="folders_tree">
                 </div>
             </div>
-            <div id="feeds_list">
+            <div id="feeds_list_container">
+                <div id="feeds_list_header"></div>
+                <div id="feeds_list"></div>
             </div>
             <div id="item_content_container">
-                <div id="item_content_div" class="item_content"></div>
+                <div tabindex="0" id="item_content_div" class="item_content"></div>
                 <iframe id="item_content_iframe" class="item_content">
                 </iframe>
             </div>

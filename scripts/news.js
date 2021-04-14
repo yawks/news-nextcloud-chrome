@@ -1,6 +1,8 @@
 var feedsInFolders = {};
 var feedsById = {};
-
+var currentFolderOrFeedId = 0;
+var selectedType = 3; //all items
+var withUnreadItems = true;
 const NB_ITEMS_TO_LOAD = 10;
 
 document.addEventListener("settings_loaded", function () {
@@ -20,15 +22,28 @@ document.addEventListener("settings_loaded", function () {
     $(".listree-submenu-items").hide();
     $(".listree-submenu-heading").removeClass("expanded");
   });
-  $("#all-items").click(function () {
-    loadItems();
+
+  //action buttons
+  $(".action-button").click(function (e) {
+    $(".action-button").removeClass("action-selected");
+    var target = e.target;
+    while (target != null && !target.id) {
+      target = target.parentNode;
+    }
+    if (target.id == "all-items") {
+      $(".tree-title").removeClass("selected");
+      $("#feeds_list_header").html("All items");
+      selectedType = 3;
+      currentFolderOrFeedId = 0;
+    } else if (target.id == "favorites") {
+      selectedType = 2;
+    } else {
+      withUnreadItems = false;
+    }
+    $("#" + target.id).addClass("action-selected");
+    loadItems(0, currentFolderOrFeedId, selectedType);
   });
-  $("#favorites").click(function () {
-    loadItems(0, 0, 2);
-  });
-  $("#unread").click(function () {
-    loadItems(0, 0, 3, false);
-  });
+
   if (getSettings().theme == "dark") {
     $("body").addClass("dark");
   }
@@ -40,7 +55,7 @@ document.addEventListener("settings_loaded", function () {
         $(this)[0].scrollHeight - 50
     ) {
       itemLoading = true;
-      loadItems($(".item:last")[0].id);
+      loadItems($(".item:last")[0].id, currentFolderOrFeedId, selectedType);
     }
   });
 
@@ -53,7 +68,8 @@ document.addEventListener("settings_loaded", function () {
 });
 
 document.addEventListener("folders_loaded", function () {
-  loadItems();
+  $("#feeds_list_header").html("All items");
+  loadItems(0, 0, 3);
 });
 
 function loadFolders() {
@@ -145,15 +161,25 @@ function loadFolders() {
       $("#folders_tree").html(tree);
       $(".feed_name").click(function (e) {
         var target = e.target;
+        $("#feeds_list_header").html(target.textContent);
         while (target != null && target.id == "") {
           target = target.parentNode;
         }
+        
+        $("#feeds_list").scrollTop(0);
         loadItems(0, target.id, 0);
       });
 
       $(".tree-title").click(function (e) {
         var target = e.target;
-        if (target.id != "") {
+        $("#feeds_list_header").html(target.textContent);
+        while (target != null && !target.id) {
+          target = target.parentNode;
+        }
+        if (target.id) {
+          $("#feeds_list").scrollTop(0);
+          $(".tree-title").removeClass("selected");
+          $(e.target).addClass("selected");
           loadItems(0, target.id, 1);
         }
       });
@@ -164,8 +190,22 @@ function loadFolders() {
   });
 }
 
-function loadItems(offset = 0, id = 0, type = 3, read = true) {
-  console.log("Load items from:"+offset);
+/**
+ * Load items
+ * @param {*} offset only return older (lower than equal that id) items than the one with id 30
+ * @param {*} id the id of the folder or feed, Use 0 for Starred and All
+ * @param {*} type the type of the query (Feed: 0, Folder: 1, Starred: 2, All: 3)
+ */
+function loadItems(offset, id, type) {
+  selectedType = type;
+  console.log(
+    "Loaditems offset: %s id:%s type:%s read:%s",
+    offset.toString(),
+    id.toString(),
+    type.toString(),
+    withUnreadItems.toString()
+  );
+  currentFolderOrFeedId = id;
   var feedsUrl =
     getSettings().nextcloudurl + "/index.php/apps/news/api/v1-2/items";
   $.ajax({
@@ -174,8 +214,8 @@ function loadItems(offset = 0, id = 0, type = 3, read = true) {
       batchSize: NB_ITEMS_TO_LOAD,
       offset: offset,
       id: id,
-      type: type,
-      getRead: read,
+      type: type == null && id != 0 ? 1 : type,
+      getRead: withUnreadItems,
     },
     headers: {
       Authorization:
@@ -335,6 +375,9 @@ function openItem(e) {
       $("#item_content_div").hide();
       $("#item_content_iframe").show();
       $("#item_content_iframe").attr("src", url);
+      $("#item_content_iframe").on("load", function (e) {
+        e.target.contentWindow.focus();
+      });
     } else {
       $("#item_content_iframe").hide();
       $("#item_content_div").show();
@@ -345,6 +388,8 @@ function openItem(e) {
         var doc = parser.parseFromString(htmlString, "text/html");
         var article = new Readability(doc).parse();
         $("#item_content_div").html(article.content);
+        $("#item_content_div").focus();
+        $("#item_content_div").scrollTop(0);
       });
     }
 
