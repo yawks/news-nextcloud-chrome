@@ -116,6 +116,16 @@ div.non-favorite {
     overflow-y: auto;
 }
 
+
+.feeds_list_container {
+    width: 350px;
+    flex: 0 0 350px;
+    float: left;
+    display: flex;
+    flex-flow: column;
+}
+
+
 #feeds_list_header {
     height: 25px;
     background-color: #ccc;
@@ -126,10 +136,8 @@ div.non-favorite {
 }
 
 #feeds_list {
-    width: 350px;
-    flex: 0 0 350px;
-    float: left;
     overflow-y: auto;
+    
 }
 
 .item_content {
@@ -160,9 +168,8 @@ div.tree-title {
     width: 100%;
 }
 
-div.tree-title.selected {
+.item-selected {
     font-weight: 900;
-    ;
 }
 
 div.feed_name img {

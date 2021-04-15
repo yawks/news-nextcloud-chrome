@@ -133,7 +133,7 @@ function loadFolders() {
         var folder = feedsInFolders[key];
         tree +=
           '<li>\
-                <div class="listree-submenu-heading"><div class="tree-title" id="' +
+                <div class="listree-submenu-heading"><div class="tree-title folder_name" id="' +
           key +
           '">' +
           folder["name"] +
@@ -165,12 +165,14 @@ function loadFolders() {
         while (target != null && target.id == "") {
           target = target.parentNode;
         }
+        $(".item-selected").removeClass("item-selected");
+        $(target).addClass("item-selected");
         
         $("#feeds_list").scrollTop(0);
         loadItems(0, target.id, 0);
       });
 
-      $(".tree-title").click(function (e) {
+      $(".folder_name").click(function (e) {
         var target = e.target;
         $("#feeds_list_header").html(target.textContent);
         while (target != null && !target.id) {
@@ -178,8 +180,8 @@ function loadFolders() {
         }
         if (target.id) {
           $("#feeds_list").scrollTop(0);
-          $(".tree-title").removeClass("selected");
-          $(e.target).addClass("selected");
+          $(".item-selected").removeClass("item-selected");
+          $(e.target).addClass("item-selected");
           loadItems(0, target.id, 1);
         }
       });
