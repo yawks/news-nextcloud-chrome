@@ -12,9 +12,12 @@ document.addEventListener("DOMContentLoaded", function () {
         chrome.tabs.update(d[0].id, { active: true, url: a });
       }
     } else {
-      chrome.tabs.create({ url: chrome.runtime.getURL("news.html") }, function (e) {
-        console.log("openTab: " + a);
-      });
+      chrome.tabs.create(
+        { url: chrome.runtime.getURL("news.html") },
+        function (e) {
+          console.log("openTab: " + a);
+        }
+      );
     }
   });
 });

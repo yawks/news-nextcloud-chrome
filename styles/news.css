@@ -376,6 +376,10 @@ div.focus {
     margin: 0 auto
 }
 
+#item_content_div:focus {
+    outline: none;
+}
+
 /* DARK THEME */
 
 body.dark, body.dark div.toolbar {

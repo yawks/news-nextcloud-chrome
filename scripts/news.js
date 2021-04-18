@@ -31,7 +31,7 @@ document.addEventListener("settings_loaded", function () {
       target = target.parentNode;
     }
     if (target.id == "all-items") {
-      $(".tree-title").removeClass("selected");
+      $(".item-selected").removeClass("item-selected");
       $("#feeds_list_header").html("All items");
       selectedType = 3;
       currentFolderOrFeedId = 0;
@@ -167,7 +167,7 @@ function loadFolders() {
         }
         $(".item-selected").removeClass("item-selected");
         $(target).addClass("item-selected");
-        
+
         $("#feeds_list").scrollTop(0);
         loadItems(0, target.id, 0);
       });
@@ -271,10 +271,12 @@ function loadItems(offset, id, type) {
         '" class="titlesfavicon">' +
         feedsById[item["feedId"]]["name"] +
         '</div>\
-                    <div class="item-date">11:45</div>\
+                    <div class="item-date">' +
+        timeSince(item["pubDate"]) +
+        "</div>\
                 </div>\
             </div>\
-        </div></div></div>';
+        </div></div></div>";
     }
     if (offset == 0) {
       $("#feeds_list").html(itemList);
