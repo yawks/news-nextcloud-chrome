@@ -207,6 +207,8 @@ function loadItems(offset, id, type) {
     type.toString(),
     withUnreadItems.toString()
   );
+  $("#feeds_list_loader").css("display","flex");
+  $("#feeds_list_header").addClass("no-bottom-border");
   currentFolderOrFeedId = id;
   var feedsUrl =
     getSettings().nextcloudurl + "/index.php/apps/news/api/v1-2/items";
@@ -277,6 +279,8 @@ function loadItems(offset, id, type) {
                 </div>\
             </div>\
         </div></div></div>";
+        $("#feeds_list_loader").hide();
+        $("#feeds_list_header").removeClass("no-bottom-border");
     }
     if (offset == 0) {
       $("#feeds_list").html(itemList);
